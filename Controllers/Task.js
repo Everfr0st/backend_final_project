@@ -41,11 +41,43 @@ const listarTasks = async( req, res = express.request ) => {
 }
 
 const actualizarTask = async( req, res = express.request ) => {
-
+    const tasks = await Task.findByIdAndUpdate( req.uid, {name: 'newname'}, 
+                                                function (err, docs) {
+        if (err){
+            console.log( err )
+            res.status(500).json({
+            ok: false,
+            msg: 'Error interno'
+            })
+        }
+        else{
+            res.status(200).json({
+                ok:true,
+                msg: 'usuario actualizado',
+                tasks
+            })
+        }
+    })
 }
+        
+
 
 const eliminarTask = async( req, res = express.request ) => {
-    
+    const tasks = await Task.findByIdAndDelete(req.uid, function(err){
+        if (!err){
+                res.status(200).json({
+                ok:true,
+                tasks,
+            })
+        }
+        else {
+            console.log( err )
+            res.status(500).json({
+            ok: false,
+            msg: 'Error interno'
+            })
+        }
+    })
 }
 
 
