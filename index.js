@@ -28,4 +28,9 @@
 const Server = require('./Server/sever');
 
 const myServer = new Server();
+
+myServer.setRoutes();
+myServer.addMiddlewares();
+myServer.sockets();
+
 myServer.listen();
