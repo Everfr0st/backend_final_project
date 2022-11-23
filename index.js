@@ -1,36 +1,49 @@
-// const express = require('express')
-// require('dotenv').config()
-// const { dbConnection } = require('./database/config')
-// const cors = require('cors')
+require('dotenv').config()
+const express = require('express')
+const { dbConnection } = require('./database/config')
+const cors = require('cors')
+const { Server } = require('socket.io');
+const http = require('http');
+const port = process.env.PORT;
 
-// //crear app
-// const app = express();
+// Crear app
+const app = express();
 
-// dbConnection();
+// Conexión a la base de datos
+dbConnection();
 
-// app.use(cors())
+// Middlewares
+app.use(cors())
+app.use( express.json() );
 
-// app.use( express.static('public'))
+// Rutas
+app.use('/api/auth', require('./routes/auth'))
+app.use('/api/task', require('./routes/task_routes'))
 
-// //Lectura y parseo del body
-// app.use( express.json() );
+// Creación del server con sockets
+const httpServer = http.createServer(app);
 
-// //Rutas
-// app.use('/api/auth', require('./routes/auth'))
-// app.use('/api/task', require('./routes/task_routes'))
+// Sockets
+const io = new Server(httpServer, {
+    cors: {
+        origin: "*",
+        methods: ["GET", "POST"]
+    }
+});
 
-
-// //Escuchar en puerto 4000
-// app.listen(process.env.PORT, () => {
-//     console.log('Servidor escuchando en el puerto', process.env.PORT)
-// })
-
-const Server = require('./Server/sever');
-
-const myServer = new Server();
-
-myServer.setRoutes();
-myServer.addMiddlewares();
-myServer.sockets();
-
-myServer.listen();
+io.on(
+    'connection',
+    socket => {
+        console.log('Cliente conectado', socket.id);
+        
+        socket.on('mensaje-de-cliente', (payload, callback) =>{
+            console.log(payload);            
+            io.emit("mensaje-de-servidor", payload);
+        })
+        
+    });
+    
+    
+httpServer.listen(port, () => {
+    console.log('Servidor escuchando en el puerto:', process.env.PORT);
+})
