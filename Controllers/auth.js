@@ -4,8 +4,11 @@ const Usuario = require('../models/Usuario');
 const { generarJWT } = require('../helpers/jwt');
 
 const crearUsuario = async (req, res = express.request) => {
-
+    console.log(req);
     const { name, email, password } = req.body
+    console.log(name);
+    console.log(email);
+    console.log(password);
 
     try{
         let usuario = await Usuario.findOne({ email:email })
